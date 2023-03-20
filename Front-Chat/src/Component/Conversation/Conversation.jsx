@@ -177,11 +177,12 @@ console.log(userDetails, "detalles de usuario")
     return <div>{deleteErrorConversation}</div>;
   }
 
-  if(loading){
-    return <Loading />
-  }
   return (
     <div className="h-screen overflow-hidden">
+       <div>
+    {loading ? (
+      <p>Cargando...</p>
+    ) : (
       <div className="h-5/6 overflow-y-auto">
         <div className="flex flex-row">
           <div className="flex flex-row" style={{ flexGrow: 5 }}>
@@ -315,6 +316,9 @@ console.log(userDetails, "detalles de usuario")
           </div>
         </form>
       </div>
+    )}
+  </div>
+
     </div>
   );
 }
