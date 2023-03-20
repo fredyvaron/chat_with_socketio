@@ -10,7 +10,7 @@ io.on("connection", (socket) => {
 conn.sync({ force: false }).then(() => {
   http.listen(process.env.PORT || 3003, () => {
     console.log(
-      `Socket.IO server running at http://localhost:${process.env.PORT}/`
+      `Sserver running`
     );
   });
 });
