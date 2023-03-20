@@ -34,6 +34,20 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
     user2: selectedUserId,
     user1: userDetails.user.user.id,
   };
+  useEffect(() => {
+    setLoading(true);
+    getidconversation(objfindconversation)
+      .then((su) => {
+        console.log(su, "resultado de getidconversation");
+        if (su !== null) {
+          setIdconversa(su);
+          console.log("se cambio el id en setidconversation por el usefect", setIdconversa)
+        }
+        setLoading(false);
+      })
+      .catch((error) => console.log(error, "error de useefect de getidconversation en conversation"));
+      setLoading(false);
+  }, [selectedUserId]);
   const navigate = useNavigate();
   const loadingdeleteConversation = useSelector(
     (state) => state.data.loadingDeleteCon
@@ -50,20 +64,7 @@ console.log(userDetails, "detalles de usuario")
   useEffect(() => {
     setCurrentUser(userDetails.user.user.id);
   }, []);
-  useEffect(() => {
-    setLoading(true);
-    getidconversation(objfindconversation)
-      .then((su) => {
-        console.log(su, "resultado de getidconversation");
-        if (su !== null) {
-          setIdconversa(su);
-          console.log("se cambio el id en setidconversation por el usefect", setIdconversa)
-        }
-        setLoading(false);
-      })
-      .catch((error) => console.log(error, "error de useefect de getidconversation en conversation"));
-      setLoading(false);
-  }, [selectedUserId]);
+
 
   useEffect(() => {
     socket.emit("join", idconversa);
