@@ -51,7 +51,12 @@ console.log(userDetails, "detalles de usuario")
   }, []);
   useEffect(() => {
     getidconversation(objfindconversation)
-      .then((su) => setIdconversa(su))
+      .then((su) => {
+        console.log(su, "resultado de getidconversation");
+        if (su !== null) {
+          setIdconversa(su);
+        }
+      })
       .catch((error) => console.log(error));
   }, [selectedUserId]);
   useEffect(() => {
