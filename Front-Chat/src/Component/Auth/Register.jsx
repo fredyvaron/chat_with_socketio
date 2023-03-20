@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register, useAuthDispatch, useAuthState } from "../../Context";
+import { showToast } from "../Notification/Toast";
 
 export default function Register() {
   const dispatch = useAuthDispatch()
   const navigate = useNavigate()
-  const { errorMessage} = useAuthState()
+  const { errorMessage, loading_registers} = useAuthState()
   const [registere, setRegistere] = useState({
     nombre: "",
     email: "",
     clave: "",
     TypeUserId: "2",
   });
+  useEffect(() => {
+    if (errorMessage) {
+      showToast(false, errorMessage)
+    }
+  }, [errorMessage])
   const handleChange = (e) => {
     e.preventDefault();
     setRegistere({ ...registere, [e.target.name]: e.target.value });
@@ -22,6 +28,7 @@ export default function Register() {
       let response = await register(dispatch, registere)
       if(!response)return
       navigate("/")
+      window.location.reload()
     } catch (error) {
       console.log(error)
     }
@@ -85,6 +92,7 @@ export default function Register() {
             <button
               className=" text-xl bg-blue-400 px-4 py-2 rounded-md hover:bg-blue-300"
               type="submit"
+              disabled={loading}
             >
               Register
             </button>
