@@ -27,6 +27,7 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
   const userDetails = useAuthState();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
   const objfindconversation = {
@@ -50,15 +51,20 @@ console.log(userDetails, "detalles de usuario")
     setCurrentUser(userDetails.user.user.id);
   }, []);
   useEffect(() => {
+    setLoading(true);
     getidconversation(objfindconversation)
       .then((su) => {
         console.log(su, "resultado de getidconversation");
         if (su !== null) {
           setIdconversa(su);
+          console.log("se cambio el id en setidconversation por el usefect", setIdconversa)
         }
+        setLoading(false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error, "error de useefect de getidconversation en conversation"));
+      setLoading(false);
   }, [selectedUserId]);
+
   useEffect(() => {
     socket.emit("join", idconversa);
   }, [idconversa]);
@@ -170,6 +176,9 @@ console.log(userDetails, "detalles de usuario")
     return <div>{deleteErrorConversation}</div>;
   }
 
+  if(loading){
+    return <Loading />
+  }
   return (
     <div className="h-screen overflow-hidden">
       <div className="h-5/6 overflow-y-auto">
