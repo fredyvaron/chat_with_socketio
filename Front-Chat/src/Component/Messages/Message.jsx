@@ -10,12 +10,14 @@ export default function Message({ match }) {
 
   const handleUserSelection = (userId) => {
     setSelectedUser(userId);
+    console.log("selected user", selectedUser)
   };
   const handleDeleteUser = () => {
     setSelectedUser(null);
   };
   useEffect(() => {
     setSelectedUser(userId);
+    console.log(userId, "selected", selectedUser)
   }, [userId]);
 
   return (

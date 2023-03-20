@@ -16,6 +16,7 @@ import { deletconversation } from "../../Redux/reducer";
 import { getProfileById } from "../../Redux/reducer";
 const ENDPOINT = "http://localhost:3001/";
 export default function Conversation({ selectedUserId, onDeleteUser }) {
+  console.log(selectedUserId, "selectedUserId")
   const dropdownBtnRef = useRef(null);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -43,7 +44,8 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
     (state) => state.data.deleteConversationError
   );
   const getprofile = useSelector((state) => state.data.profile);
-
+console.log(idconversa, "idconversacion")
+console.log(userDetails, "detalles de usuario")
   useEffect(() => {
     setCurrentUser(userDetails.user.user.id);
   }, []);
@@ -92,6 +94,7 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
   }, [deletesuccesConversation]);
   const handleSendMessage = (e) => {
     e.preventDefault();
+    console.log("seleccion enviar mensaje")
     const body = {
       idconversa,
       message,
@@ -100,10 +103,12 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
       sender_id: userDetails.user.user.id,
       receiver_id: selectedUserId,
     };
+    console.log(body, "body de send message")
     socket.emit("message", body);
     setMessage("");
   };
   const handaboutprofile = () => {
+    console.log("seleccion handleabout profile")
     navigate(`/profiles/${selectedUserId}`);
   };
   const handledeleConversation = async () => {
@@ -117,12 +122,6 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
     }
   };
   useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-  useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         showDropdown &&
@@ -132,12 +131,13 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
         showDropdown(false);
       }
     };
-
+  
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDropdown]);
+  
   const handleClickOutside = (e) => {
     if (
       dropdownRef.current &&
@@ -147,11 +147,17 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
       setShowDropdown(false);
     }
   };
-
+  
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+  
   const handleDropdownToggle = () => {
     setShowDropdown(!showDropdown);
   };
-
   if (isLoading) {
     return <Loading />;
   }

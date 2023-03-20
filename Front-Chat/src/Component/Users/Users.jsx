@@ -6,7 +6,9 @@ import User from "./User";
 export default function Users({ onUserSelection }) {
   const handleSelection = (userId) => {
     onUserSelection(userId);
+    console.log(onUserSelection,"selected")
   };
+  
   const dispatch = useDispatch();
   const users = useSelector((state) => state.data.users);
   useEffect(() => {
