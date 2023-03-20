@@ -1,0 +1,11 @@
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
+  background-color: white;
+  color: black;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
+}
