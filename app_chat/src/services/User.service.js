@@ -3,11 +3,13 @@ const bcrypt = require("bcrypt");
 const db = require("../db");
 const { Op } = require("sequelize");
 const registerUsers = async (body) => {
-  console.log(body.clave, "body");
+  console.log(body, "body");
   body.clave = bcrypt.hashSync(body.clave, bcrypt.genSaltSync(8));
-
-  const user = await db.User.create(body);
+  console.log(body.clave, "clave encriptada")
+  const user = await User.create(body);
+  console.log(user, "user");
   const filter = await filterUserPassword(user);
+  console.log(filter, "filter");
   return filter;
 };
 //function editarUser with sequalize

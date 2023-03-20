@@ -5,6 +5,7 @@ const cloudinary = require('cloudinary').v2;
 
 const registerUser = async (req, res) => {
   const body = req.body;
+  console.log(req, "request")
   const exist = await emailUser(body.email);
   cloudinary.config(config);
   if (exist !== null) {
@@ -14,11 +15,14 @@ const registerUser = async (req, res) => {
     return Error(res, "No se proporcionó un archivo");
   }
   try {
+    console.log(req.file, "request file")
     const image = await cloudinary.uploader.upload(req.file.path);
     body.image = image.secure_url;
+    console.log(body, "body de imagen")
     const data = await registerUsers(body);
     return Ok(res, data);
   } catch (error) {
+    console.log(error)
     return Error(res, error);
   }
 };

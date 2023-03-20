@@ -4,40 +4,66 @@ import { register, useAuthDispatch, useAuthState } from "../../Context";
 import { showToast } from "../Notification/Toast";
 
 export default function Register() {
-  const dispatch = useAuthDispatch()
-  const navigate = useNavigate()
-  const { errorMessage, loading_registers} = useAuthState()
+
+  const dispatch = useAuthDispatch();
+  const navigate = useNavigate();
+  const [tempFile, setTempFile] = useState("https://via.placeholder.com/150");
+ // si user.image es falsy, usa la URL de una imagen predeterminada
+  const { errorMessage, loading_registers } = useAuthState();
   const [registere, setRegistere] = useState({
     nombre: "",
     email: "",
     clave: "",
-    TypeUserId: "2",
+    TypeUserId: "1",
   });
   useEffect(() => {
     if (errorMessage) {
-      showToast(false, errorMessage)
+      showToast(false, errorMessage);
     }
-  }, [errorMessage])
+  }, [errorMessage]);
   const handleChange = (e) => {
     e.preventDefault();
     setRegistere({ ...registere, [e.target.name]: e.target.value });
   };
+  const handlechangeimage = (e) => {
+    e.preventDefault();
+    console.log(e.target.files);
+    const file = e.target.files[0];
+    setTempFile(file);
+  };
+ 
   const handlesubmit = async (e) => {
     e.preventDefault();
-    try {
-      let response = await register(dispatch, registere)
-      if(!response)return
-      navigate("/")
-      window.location.reload()
+    console.log(registere, "registere")
+    console.log(tempFile, tempFile.name, "nombre de la imagen")
+    const formData = new FormData();
+    formData.append("nombre", registere.nombre);
+    formData.append("email", registere.email);
+    formData.append("clave", registere.clave);
+    formData.append("TypeUserId", registere.TypeUserId);
+    if (tempFile) {
+      formData.append("image", tempFile, tempFile.name); // agrega el archivo con su nombre
+    }
+      // Imprime los datos del objeto FormData
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+   
+ try {
+      let response = await register(dispatch, formData);
+      if (!response) return;
+      navigate("/");
+     
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     setRegistere({
       nombre: "",
       email: "",
       clave: "",
       TypeUserId: "2",
-    });
+    }); 
+    setTempFile("https://via.placeholder.com/150")
   };
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -86,6 +112,19 @@ export default function Register() {
               id="nombre"
               value={registere.nombre}
               onChange={handleChange}
+            />
+          </div>
+          <div className="mt-4">
+            <label htmlFor="imagen" className="block text-xl mb-1">
+              Imagen
+            </label>
+            <input
+              className="block w-full mt-2 px-2 py-4 text-gray-900 border rounded-md focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+              type="file"
+              name="imagen"
+              id="imagen"
+              onChange={handlechangeimage}
+              placeholder="Imagen"
             />
           </div>
           <div className="flex items-center justify-center mt-6">

@@ -12,6 +12,9 @@ export async function register(dispatch, payload) {
   try {
     dispatch({ type: REQUEST_REGISTER });
     console.log(local_url, "local url")
+    for (let [key, value] of payload.entries()) {
+      console.log(`${key}: ${value}`);
+    }
     const json = await axios.post(`${local_url}/auth/register`, payload);
     console.log(json, "json")
     if (json.data.statusMsg == "Success") {
