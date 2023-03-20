@@ -92,7 +92,7 @@ export default function Register() {
             <button
               className=" text-xl bg-blue-400 px-4 py-2 rounded-md hover:bg-blue-300"
               type="submit"
-              disabled={loading}
+              disabled={loading_registers}
             >
               Register
             </button>

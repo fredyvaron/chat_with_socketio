@@ -11,8 +11,10 @@ export const USER_UPDATE = "USER_UPDATE";
 export async function register(dispatch, payload) {
   try {
     dispatch({ type: REQUEST_REGISTER });
+    console.log(local_url, "local url")
     const json = await axios.post(`${local_url}/auth/register`, payload);
-    if (json.data.statusMsg === "Success") {
+    console.log(json, "json")
+    if (json.data.statusMsg == "Success") {
       const { data } = json;
       dispatch({
         type: REGISTER_SUCCESS,
