@@ -61,7 +61,7 @@ export default function Message() {
         </div>
 
         <div className="border-solid border border-gray-400 sm:basis-full basis-1/2 md:basis-3/4 ">
-          {loading || !selectedUser ? (
+          {loading || !selectedUser || !idconversa ? (
             <div className="h-full flex justify-center items-center">
               <img
                 src={imguserselect}
