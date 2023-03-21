@@ -232,7 +232,7 @@ console.log(userDetaile, "detalles de usuario")
         </div>
 
         <hr />
-        {Array.isArray(messages) ? (
+{/*         {Array.isArray(messages) ? (
           messages?.map((mens, index) => (
             <div key={index}>
               {mens.sender_id === currentUser ? (
@@ -246,7 +246,7 @@ console.log(userDetaile, "detalles de usuario")
           ))
         ) : (
           <>No Hay Mensages</>
-        )}
+        )} */}
 
         <form onSubmit={(e) => handleSendMessage(e)}>
           <div className="flex flex-row items-center m-2">
