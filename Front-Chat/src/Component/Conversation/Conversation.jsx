@@ -64,6 +64,7 @@ console.log(userDetaile, "detalles de usuario")
     });
     setIsLoading(true);
     socket.emit("getmessage", { id: idconversation });
+    console.log(idconversation, "conversation idsss did sds")
     socket.on("getmessage", (message) => {
       console.log(message, "getmessage")
       setMessages(message);
