@@ -15,7 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { deletconversation } from "../../Redux/reducer";
 import { getProfileById } from "../../Redux/reducer";
 import { putReadConversation } from "../../utils/service";
-const ENDPOINT = "http://localhost:3001/";
+const ENDPOINT = import.meta.env.VITE_REACT_APP_URL_LOCAL;
+console.log(ENDPOINT, "endpoint")
 export default function Conversation({ selectedUserId, onDeleteUser, userDetaile, idconversation }) {
   const dropdownBtnRef = useRef(null);
   const dropdownRef = useRef(null);
