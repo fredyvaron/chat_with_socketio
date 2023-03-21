@@ -45,6 +45,7 @@ console.log(userDetaile, "detalles de usuario")
   }, []);
   useEffect(() => {
     if (!idconversation) {
+      console.log("no tiene id de conversation")
     return <Loading />;
     }
     }, [idconversation]);
