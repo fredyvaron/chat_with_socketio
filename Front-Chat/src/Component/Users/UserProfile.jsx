@@ -3,6 +3,7 @@ import user from "../../assets/icon-1633249.svg";
 import { Link } from "react-router-dom";
 
 export default function UserProfile({ User }) {
+  console.log(User, "User profile")
   return (
     <Link to={`/profiles/${User.id}`}>
       <div className="flex flex-row items-center py-4 px-4 cursor-pointer w-full">

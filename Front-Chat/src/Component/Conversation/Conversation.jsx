@@ -111,7 +111,8 @@ console.log(userDetaile, "detalles de usuario")
     setMessage("");
   };
   const handaboutprofile = () => {
-    console.log("seleccion handleabout profile")
+    console.log(selectedUserId, "selectedUserId")
+    console.log("seleccion handleabout profile ")
     navigate(`/profiles/${selectedUserId}`);
   };
   const handledeleConversation = async () => {
