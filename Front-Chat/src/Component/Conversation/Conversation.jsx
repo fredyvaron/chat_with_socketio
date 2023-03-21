@@ -37,6 +37,7 @@ export default function Conversation({ selectedUserId, onDeleteUser, userDetaile
   const deleteErrorConversation = useSelector(
     (state) => state.data.deleteConversationError
   );
+  console.log(message, "mensajes")
   const getprofile = useSelector((state) => state.data.profile);
 console.log(idconversation, "idconversacion")
 console.log(userDetaile, "detalles de usuario")
