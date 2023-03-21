@@ -175,7 +175,8 @@ console.log(userDetaile, "detalles de usuario")
       <div className="h-5/6 overflow-y-auto">
         <div className="flex flex-row">
           <div className="flex flex-row" style={{ flexGrow: 5 }}>
-            <UserDetail User={getprofile} />
+            {getprofile ? (<UserDetail User={getprofile} />): (<Loading/>)}
+             
           </div>
           <div
             className="flex flex-row-reverse pr-3 pt-3 pb-2 "
