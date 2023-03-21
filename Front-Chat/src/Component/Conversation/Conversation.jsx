@@ -68,12 +68,18 @@ console.log(userDetaile, "detalles de usuario")
     socket.on("getmessage", (message) => {
       console.log(message, "getmessage")
       setMessages(message);
+      putReadConversation(idconversation)
+        .then((su) => console.log(su))
+        .catch((err) => console.log(err));
       setIsLoading(false);
       console.log(messages, "messages in usefect")
     });
     socket.on("message", (data) => {
       console.log(data, "data of messaage")
       setMessages(data);
+      putReadConversation(idconversation)
+        .then((su) => console.log(su, "su de read conversation"))
+        .catch((err) => console.log(err, "error de read conversation"));
       setIsLoading(false);
       console.log(message, "message of conversation useefect getmessage")
     });
