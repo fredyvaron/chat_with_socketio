@@ -5,6 +5,7 @@ moment.locale('es')
 
 export default function UserMessage({msg}) {
   // Use moment now that the locale has been properly set.
+  console.log(msg)
   return (
     <div className='flex flex-col sm:flex-row items-center px-4 mt-4'>
       <UserImage iduser={msg.sender_id}/>
