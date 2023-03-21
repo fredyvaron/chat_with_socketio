@@ -37,7 +37,8 @@ export default function Conversation({ selectedUserId, onDeleteUser, userDetaile
   const deleteErrorConversation = useSelector(
     (state) => state.data.deleteConversationError
   );
-  console.log(message, "mensajes")
+
+  console.log(currentUser, "currentUser")
   const getprofile = useSelector((state) => state.data.profile);
 console.log(idconversation, "idconversacion")
 console.log(userDetaile, "detalles de usuario")
@@ -163,7 +164,7 @@ console.log(userDetaile, "detalles de usuario")
   if (deleteErrorConversation) {
     return <div>{deleteErrorConversation}</div>;
   }
-
+  console.log(message, "mensajes")
   return (
     <div className="h-screen overflow-hidden">
        <div>
