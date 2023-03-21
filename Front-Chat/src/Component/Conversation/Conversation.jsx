@@ -227,7 +227,7 @@ console.log(userDetaile, "detalles de usuario")
 
         <hr />
         {Array.isArray(messages) ? (
-          messages.map((mens, index) => (
+          messages?.map((mens, index) => (
             <div key={index}>
               {mens.sender_id === currentUser ? (
                 <UserMessage msg={mens} />
