@@ -68,18 +68,12 @@ console.log(userDetaile, "detalles de usuario")
     socket.on("getmessage", (message) => {
       console.log(message, "getmessage")
       setMessages(message);
-      putReadConversation(idconversation)
-        .then((su) => console.log(su))
-        .catch((err) => console.log(err));
       setIsLoading(false);
       console.log(messages, "messages in usefect")
     });
     socket.on("message", (data) => {
       console.log(data, "data of messaage")
       setMessages(data);
-      putReadConversation(idconversation)
-        .then((su) => console.log(su, "su de read conversation"))
-        .catch((err) => console.log(err, "error de read conversation"));
       setIsLoading(false);
       console.log(message, "message of conversation useefect getmessage")
     });
@@ -232,7 +226,7 @@ console.log(userDetaile, "detalles de usuario")
         </div>
 
         <hr />
-{/*         {Array.isArray(messages) ? (
+        {Array.isArray(messages) ? (
           messages?.map((mens, index) => (
             <div key={index}>
               {mens.sender_id === currentUser ? (
@@ -246,7 +240,7 @@ console.log(userDetaile, "detalles de usuario")
           ))
         ) : (
           <>No Hay Mensages</>
-        )} */}
+        )}
 
         <form onSubmit={(e) => handleSendMessage(e)}>
           <div className="flex flex-row items-center m-2">
