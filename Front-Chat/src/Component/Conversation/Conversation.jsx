@@ -63,13 +63,14 @@ console.log(userDetaile, "detalles de usuario")
     });
     setIsLoading(true);
     socket.emit("getmessage", { id: idconversation });
-    socket.on("getmessage", (messages) => {
-      console.log(messages, "getmessage")
-      setMessages(messages);
+    socket.on("getmessage", (message) => {
+      console.log(message, "getmessage")
+      setMessages(message);
       putReadConversation(idconversation)
         .then((su) => console.log(su))
         .catch((err) => console.log(err));
       setIsLoading(false);
+      console.log(messages)
     });
     socket.on("message", (data) => {
       setMessages(data);
