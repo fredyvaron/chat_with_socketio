@@ -18,8 +18,8 @@ export default function Users({ onUserSelection }) {
     setLoading(true);
     dispatch(get_all_users()).then(() => {
       setLoading(false);
-      console.log("se cambio el loading a false");
     });
+    setLoading(false)
   }, [dispatch]);
   return (
     <div className="h-screen overflow-hidden">
