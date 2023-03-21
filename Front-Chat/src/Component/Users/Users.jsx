@@ -25,7 +25,7 @@ export default function Users({ onUserSelection }) {
     <div className="h-screen overflow-hidden">
       <div className="h-5/6 overflow-y-auto">
         <div className="flex flex-col gap-2">
-          {loading ? (
+          { !loading ? (
             users?.map((user) => (
               <div key={user.id} onClick={() => handleSelection(user.id)}>
                 <User User={user} />
