@@ -43,7 +43,11 @@ console.log(userDetaile, "detalles de usuario")
   useEffect(() => {
     setCurrentUser(userDetaile.user.user.id);
   }, []);
-
+  useEffect(() => {
+    if (!idconversation) {
+    return <Loading />;
+    }
+    }, [idconversation]);
 
   useEffect(() => {
     socket.emit("join", idconversation);

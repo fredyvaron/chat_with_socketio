@@ -5,6 +5,7 @@ import { getProfileById } from "../../Redux/reducer";
 import { useNavigate } from "react-router-dom";
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Loading from "../Loading/Loading";
 
 const Profiles = () => {
   const { id } = useParams();
@@ -48,7 +49,7 @@ const Profiles = () => {
           </button>
           </div>
         </div>
-      ) : null}
+      ) : <Loading/>}
     </div>
   );
 };

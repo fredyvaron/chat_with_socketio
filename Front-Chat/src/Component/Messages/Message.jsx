@@ -6,12 +6,12 @@ import { useParams } from "react-router-dom";
 import { useAuthState } from "../../Context/";
 import { getidconversation } from "../../utils/service";
 
-export default function Message({ match }) {
+export default function Message() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [idconversa, setIdconversa] = useState(null);
   const [loading, setLoading] = useState(true);
   const userDetails = useAuthState();
-  const { userId } = useParams();
+  const { idUser } = useParams();
   const objfindconversation = {
     user2: selectedUser,
     user1: userDetails.user.user.id,
@@ -25,9 +25,9 @@ export default function Message({ match }) {
     setSelectedUser(null);
   };
   useEffect(() => {
-    setSelectedUser(userId);
-    console.log(userId, "selected", selectedUser);
-  }, [userId]);
+    setSelectedUser(idUser);
+    console.log(idUser, "selected", selectedUser);
+  }, [idUser]);
 
   useEffect(() => {
     if(!selectedUser) return;
@@ -47,7 +47,7 @@ export default function Message({ match }) {
       .catch((error) =>
         console.log(
           error,
-          "error de useefect de getidconversation en conversation"
+          "error de useefect de getidconversation en message"
         )
       );
     setLoading(false);

@@ -24,7 +24,7 @@ function App() {
           <Routes>
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<Home />} />
-              <Route path="/messages/:userId?" element={<Message />} />
+              <Route path="/messages/:idUser?" element={<Message />} />
               <Route path="/profile" element={<PerfilWithContext />} />
               <Route path="/profiles/:id" element={<Profiles />} />
             </Route>
