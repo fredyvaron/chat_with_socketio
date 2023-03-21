@@ -70,7 +70,7 @@ console.log(userDetaile, "detalles de usuario")
         .then((su) => console.log(su))
         .catch((err) => console.log(err));
       setIsLoading(false);
-      console.log(messages)
+      console.log(messages, "messages in usefect")
     });
     socket.on("message", (data) => {
       setMessages(data);
