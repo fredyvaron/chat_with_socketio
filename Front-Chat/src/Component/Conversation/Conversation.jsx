@@ -7,47 +7,26 @@ import UserMessage from "../Messages/UserMessage";
 import UserMessageFrom from "../Messages/UserMessageFrom";
 import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
-import { useAuthState } from "../../Context";
-import { getidconversation, putReadConversation } from "../../utils/service";
+/* import { useAuthState } from "../../Context";
+import { getidconversation, putReadConversation } from "../../utils/service"; */
 import UserDetail from "../Users/UserProfile";
 import Loading from "../Loading/Loading";
 import { useDispatch, useSelector } from "react-redux";
 import { deletconversation } from "../../Redux/reducer";
 import { getProfileById } from "../../Redux/reducer";
+import { putReadConversation } from "../../utils/service";
 const ENDPOINT = "http://localhost:3001/";
-export default function Conversation({ selectedUserId, onDeleteUser }) {
-  console.log(selectedUserId, "selectedUserId")
+export default function Conversation({ selectedUserId, onDeleteUser, userDetaile, idconversation }) {
   const dropdownBtnRef = useRef(null);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dispatch = useDispatch();
   const socket = io(ENDPOINT);
   const [currentUser, setCurrentUser] = useState(null);
-  const [idconversa, setIdconversa] = useState(null);
-  const userDetails = useAuthState();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
-  const objfindconversation = {
-    user2: selectedUserId,
-    user1: userDetails.user.user.id,
-  };
-  useEffect(() => {
-    setLoading(true);
-    getidconversation(objfindconversation)
-      .then((su) => {
-        console.log(su, "resultado de getidconversation");
-        if (su !== null) {
-          setIdconversa(su);
-          console.log("se cambio el id en setidconversation por el usefect", setIdconversa)
-        }
-        setLoading(false);
-      })
-      .catch((error) => console.log(error, "error de useefect de getidconversation en conversation"));
-      setLoading(false);
-  }, [selectedUserId]);
   const navigate = useNavigate();
   const loadingdeleteConversation = useSelector(
     (state) => state.data.loadingDeleteCon
@@ -59,16 +38,16 @@ export default function Conversation({ selectedUserId, onDeleteUser }) {
     (state) => state.data.deleteConversationError
   );
   const getprofile = useSelector((state) => state.data.profile);
-console.log(idconversa, "idconversacion")
-console.log(userDetails, "detalles de usuario")
+console.log(idconversation, "idconversacion")
+console.log(userDetaile, "detalles de usuario")
   useEffect(() => {
-    setCurrentUser(userDetails.user.user.id);
+    setCurrentUser(userDetaile.user.user.id);
   }, []);
 
 
   useEffect(() => {
-    socket.emit("join", idconversa);
-  }, [idconversa]);
+    socket.emit("join", idconversation);
+  }, [idconversation]);
   useEffect(() => {
     dispatch(getProfileById(selectedUserId));
   }, [selectedUserId]);
@@ -77,17 +56,17 @@ console.log(userDetails, "detalles de usuario")
       console.log("conected to server socket", message);
     });
     setIsLoading(true);
-    socket.emit("getmessage", { id: idconversa });
+    socket.emit("getmessage", { id: idconversation });
     socket.on("getmessage", (messages) => {
       setMessages(messages);
-      putReadConversation(idconversa)
+      putReadConversation(idconversation)
         .then((su) => console.log(su))
         .catch((err) => console.log(err));
       setIsLoading(false);
     });
     socket.on("message", (data) => {
       setMessages(data);
-      putReadConversation(idconversa)
+      putReadConversation(idconversation)
         .then((su) => console.log(su))
         .catch((err) => console.log(err));
       setIsLoading(false);
@@ -95,7 +74,7 @@ console.log(userDetails, "detalles de usuario")
     return () => {
       socket.off("message");
     };
-  }, [idconversa]);
+  }, [idconversation]);
   useEffect(() => {
     if (deleteErrorConversation) {
       return <div>{deleteErrorConversation}</div>;
@@ -108,11 +87,11 @@ console.log(userDetails, "detalles de usuario")
     e.preventDefault();
     console.log("seleccion enviar mensaje")
     const body = {
-      idconversa,
+      idconversation,
       message,
       user2: selectedUserId,
-      user1: userDetails.user.user.id,
-      sender_id: userDetails.user.user.id,
+      user1: userDetaile.user.user.id,
+      sender_id: userDetaile.user.user.id,
       receiver_id: selectedUserId,
     };
     console.log(body, "body de send message")
@@ -127,7 +106,7 @@ console.log(userDetails, "detalles de usuario")
     if (!deleted) {
       try {
         setDeleted(true);
-        await dispatch(deletconversation(idconversa));
+        await dispatch(deletconversation(idconversation));
       } catch (error) {
         console.log(error);
       }
@@ -180,9 +159,6 @@ console.log(userDetails, "detalles de usuario")
   return (
     <div className="h-screen overflow-hidden">
        <div>
-    {loading ? (
-      <p>Cargando...</p>
-    ) : (
       <div className="h-5/6 overflow-y-auto">
         <div className="flex flex-row">
           <div className="flex flex-row" style={{ flexGrow: 5 }}>
@@ -316,7 +292,7 @@ console.log(userDetails, "detalles de usuario")
           </div>
         </form>
       </div>
-    )}
+  
   </div>
 
     </div>
