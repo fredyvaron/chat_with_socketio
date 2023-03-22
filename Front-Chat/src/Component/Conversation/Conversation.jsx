@@ -114,6 +114,9 @@ export default function Conversation({
     };
     console.log(body, "body de send message");
     socket.emit("message", body);
+    const notification = { text: 'Tienes una nueva notificación', recipientId: selectedUserId }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
+    console.log('Notificación', notification)
+    socket.emit('sendNotification', notification ); // Enviar la notificación al servidor
     setMessage("");
   };
   const handaboutprofile = () => {

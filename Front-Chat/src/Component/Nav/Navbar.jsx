@@ -14,12 +14,13 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [notifications, setNotifications] = useState([]); 
   const [navbar, setNavbar] = useState(false);
   let { isAuthenticated } = useAuthState();
   const userDetails = useAuthState();
   const navigate = useNavigate();
   const dispatch = useAuthDispatch();
-  const socket = io(import.meta.env.VITE_REACT_APP_URL_LOCAL); // Conectar al servidor WebSocket
+ 
 
   const handlelogout = async (e) => {
     e.preventDefault();
@@ -73,14 +74,17 @@ export default function Navbar() {
   const handleDropdownToggle1 = () => {
     setShowDropdown1(!showDropdown1);
   };
-
   useEffect(() => {
-    console.log(userDetails, "userdetails tiene datos en el usefefct")
-    console.log("ingreso al usefect de navbar")
-    
-    socket.on("new_message", (message) => {
-      // Mostrar notificación de nuevo mensaje
-      console.log(message, "new message notification")
+    const socket = io.connect('http://localhost:3001'); // Conectar al servidor WebSocket
+  
+    socket.on('connection', () => {
+      console.log(`Conectado con ID ${socket.id}`);
+    });
+    console.log(userDetails.user.user)
+    socket.emit("join", userDetails.user.user.id);
+    socket.on('newNotification', (message) => {
+      setUnreadMessages((prevUnreadMessages) => prevUnreadMessages + 1);
+      console.log(`Nueva notificación recibida: ${message}`);
     });
 
     return () => {

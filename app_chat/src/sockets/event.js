@@ -1,4 +1,7 @@
-const { createConversation, findConversation } = require("../services/Conversation.service");
+const {
+  createConversation,
+  findConversation,
+} = require("../services/Conversation.service");
 const { createMesage, getMesageUser } = require("../services/Message.service");
 
 module.exports = (socket) => {
@@ -9,20 +12,20 @@ module.exports = (socket) => {
     console.log(body, "bode de message");
     try {
       let conversation = await findConversation(body);
-      console.log("se creo la conversation", conversation)
+      console.log("se creo la conversation", conversation);
       if (!conversation) {
         conversation = await createConversation(body);
-        console.log(conversation, "se creo la conversacion")
+        console.log(conversation, "se creo la conversacion");
       }
       if (body.message) {
         const newMessage = await createMesage(body, conversation.id);
         console.log(newMessage, "se creo el mensaje");
       }
       const conversationId = conversation.id;
-      const recipientId = conversation.receiver_id
-      console.log(recipientId, "id destinatario")
+      const recipientId = conversation.receiver_id;
+      console.log(conversation, "conversation")
+      console.log(recipientId, "id destinatario");
       const get = await getMesageUser(conversationId);
-      console.log(get, "get message")
       socket.to(conversationId).emit("message", get);
       socket.to(recipientId).emit("new_message", "You have a new message!");
       /* eturn Ok(res, conversation); */
@@ -38,13 +41,17 @@ module.exports = (socket) => {
       const get = await getMesageUser(data.id);
       console.log(get, "get message");
       if (get.length === 0) {
-      
         return socket.emit("getmessage", "Not Found");
       }
-      socket.to(data.id).emit("getmessage", get)
+      socket.to(data.id).emit("getmessage", get);
       return socket.emit("getmessage", get);
     } catch (error) {
       return socket.emit("getmessage", error);
     }
+  });
+  socket.on("sendNotification", (message) => {
+    console.log(message, "message of rece")
+    console.log("llego notificacion");
+    socket.emit("sendNotification",message.text);
   });
 };
