@@ -16,8 +16,13 @@ import { deletconversation } from "../../Redux/reducer";
 import { getProfileById } from "../../Redux/reducer";
 import { putReadConversation } from "../../utils/service";
 const ENDPOINT = import.meta.env.VITE_REACT_APP_URL_LOCAL;
-console.log(ENDPOINT, "endpoint")
-export default function Conversation({ selectedUserId, onDeleteUser, userDetaile, idconversation }) {
+console.log(ENDPOINT, "endpoint");
+export default function Conversation({
+  selectedUserId,
+  onDeleteUser,
+  userDetaile,
+  idconversation,
+}) {
   const dropdownBtnRef = useRef(null);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -39,19 +44,19 @@ export default function Conversation({ selectedUserId, onDeleteUser, userDetaile
     (state) => state.data.deleteConversationError
   );
 
-  console.log(currentUser, "currentUser")
+  console.log(currentUser, "currentUser");
   const getprofile = useSelector((state) => state.data.profile);
-console.log(idconversation, "idconversacion")
-console.log(userDetaile, "detalles de usuario")
+  console.log(idconversation, "idconversacion");
+  console.log(userDetaile, "detalles de usuario");
   useEffect(() => {
     setCurrentUser(userDetaile.user.user.id);
   }, []);
   useEffect(() => {
     if (!idconversation) {
-      console.log("no tiene id de conversation")
-    return <Loading />;
+      console.log("no tiene id de conversation");
+      return <Loading />;
     }
-    }, [idconversation]);
+  }, [idconversation]);
 
   useEffect(() => {
     socket.emit("join", idconversation);
@@ -65,24 +70,24 @@ console.log(userDetaile, "detalles de usuario")
     });
     setIsLoading(true);
     socket.emit("getmessage", { id: idconversation });
-    console.log(idconversation, "conversation idsss did sds")
+    console.log(idconversation, "conversation idsss did sds");
     socket.on("getmessage", (message) => {
-      console.log(message, "getmessage")
+      console.log(message, "getmessage");
       setMessages(message);
       putReadConversation(idconversation)
         .then((su) => console.log(su))
         .catch((err) => console.log(err));
       setIsLoading(false);
-      console.log(messages, "messages in usefect")
+      console.log(messages, "messages in usefect");
     });
     socket.on("message", (data) => {
-      console.log(data, "data of messaage")
+      console.log(data, "data of messaage");
       setMessages(data);
       putReadConversation(idconversation)
         .then((su) => console.log(su, "su de read conversation"))
         .catch((err) => console.log(err, "error de read conversation"));
       setIsLoading(false);
-      console.log(message, "message of conversation useefect getmessage")
+      console.log(message, "message of conversation useefect getmessage");
     });
     return () => {
       socket.off("message");
@@ -98,7 +103,7 @@ console.log(userDetaile, "detalles de usuario")
   }, [deletesuccesConversation]);
   const handleSendMessage = (e) => {
     e.preventDefault();
-    console.log("seleccion enviar mensaje")
+    console.log("seleccion enviar mensaje");
     const body = {
       idconversation,
       message,
@@ -107,13 +112,13 @@ console.log(userDetaile, "detalles de usuario")
       sender_id: userDetaile.user.user.id,
       receiver_id: selectedUserId,
     };
-    console.log(body, "body de send message")
+    console.log(body, "body de send message");
     socket.emit("message", body);
     setMessage("");
   };
   const handaboutprofile = () => {
-    console.log(selectedUserId, "selectedUserId")
-    console.log("seleccion handleabout profile ")
+    console.log(selectedUserId, "selectedUserId");
+    console.log("seleccion handleabout profile ");
     navigate(`/profiles/${selectedUserId}`);
   };
   const handledeleConversation = async () => {
@@ -136,13 +141,13 @@ console.log(userDetaile, "detalles de usuario")
         showDropdown(false);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDropdown]);
-  
+
   const handleClickOutside = (e) => {
     if (
       dropdownRef.current &&
@@ -152,14 +157,14 @@ console.log(userDetaile, "detalles de usuario")
       setShowDropdown(false);
     }
   };
-  
+
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-  
+
   const handleDropdownToggle = () => {
     setShowDropdown(!showDropdown);
   };
@@ -169,147 +174,144 @@ console.log(userDetaile, "detalles de usuario")
   if (deleteErrorConversation) {
     return <div>{deleteErrorConversation}</div>;
   }
-  console.log(message, "mensajes")
+  console.log(message, "mensajes");
   return (
-    <div className="h-screen overflow-hidden">
-       <div>
-      <div className="h-5/6 overflow-y-auto">
-        <div className="flex flex-row">
-          <div className="flex flex-row" style={{ flexGrow: 5 }}>
-            {getprofile ? (<UserDetail User={getprofile} />): (<Loading/>)}
-             
-          </div>
-          <div
-            className="flex flex-row-reverse pr-3 pt-3 pb-2 "
-            style={{ flexGrow: 1 }}
-          >
-            <button
-              className=""
-              ref={dropdownBtnRef}
-              onClick={handleDropdownToggle}
+    <div className="h-auto max-h-full overflow-y-auto">
+      <div>
+        <div className="h-5/6 overflow-y-auto">
+          <div className="flex flex-row">
+            <div className="flex flex-row" style={{ flexGrow: 5 }}>
+              {getprofile ? <UserDetail User={getprofile} /> : <Loading />}
+            </div>
+            <div
+              className="flex flex-row-reverse pr-3 pt-3 pb-2 "
+              style={{ flexGrow: 1 }}
             >
-              <FontAwesomeIcon
-                icon={faEllipsis}
-                className="h-10 w-10  text-black rounded-full  transition duration-500 ease-in-out  hover:scale-125 hover:bg-slate-400"
-              />
-            </button>
-            {showDropdown && (
-              <div
-                className="absolute right-0 mt-12 w-60 p-4"
-                ref={dropdownRef}
-                onClick={(e) => e.stopPropagation()}
+              <button
+                className=""
+                ref={dropdownBtnRef}
+                onClick={handleDropdownToggle}
               >
-                <ul className=" bg-white list-none  rounded-lg shadow-2xl z-10">
-                  <li
-                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteUser();
-                    }}
-                  >
-                    Cerrar Chat
-                  </li>
-                  <li
-                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handledeleConversation();
-                    }}
-                    disabled={deleted}
-                  >
-                    Borrar Conversacion
-                  </li>
-                  <li
-                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handaboutprofile();
-                    }}
-                  >
-                    Informacion Del Contacto
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <hr />
-        {Array.isArray(messages) ? (
-          messages?.map((mens, index) => (
-            <div key={index}>
-              {mens.sender_id === currentUser ? (
-                <UserMessage msg={mens} />
-              ) : (
-                <div className="flex justify-end">
-                  <UserMessageFrom msg={mens} className="flex justify-end" />
+                <FontAwesomeIcon
+                  icon={faEllipsis}
+                  className="h-10 w-10  text-black rounded-full  transition duration-500 ease-in-out  hover:scale-125 hover:bg-slate-400"
+                />
+              </button>
+              {showDropdown && (
+                <div
+                  className="absolute right-0 mt-12 w-60 p-4"
+                  ref={dropdownRef}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ul className=" bg-white list-none  rounded-lg shadow-2xl z-10">
+                    <li
+                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteUser();
+                      }}
+                    >
+                      Cerrar Chat
+                    </li>
+                    <li
+                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handledeleConversation();
+                      }}
+                      disabled={deleted}
+                    >
+                      Borrar Conversacion
+                    </li>
+                    <li
+                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handaboutprofile();
+                      }}
+                    >
+                      Informacion Del Contacto
+                    </li>
+                  </ul>
                 </div>
               )}
             </div>
-          ))
-        ) : (
-          <>No Hay Mensages</>
-        )}
-
-        <form onSubmit={(e) => handleSendMessage(e)}>
-          <div className="flex flex-row items-center m-2">
-            <div className="basis-1.5/12">
-              <button className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div className="basis-11/12">
-              <input
-                type="text"
-                name="message"
-                id="message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="block w-full  px-4 py-1.5 rounded border border-solid border-gray-300 bg-white bg-clip-padding
-           focus:text-gray-700 focus:bg-white focus:border-blue-700 focus:outline-none"
-                placeholder="New Message"
-              />
-            </div>
-            <div className="basis-1.5/12">
-              <button
-                type="submit"
-                className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-8 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                  />
-                </svg>
-              </button>
-            </div>
           </div>
-        </form>
-      </div>
-  
-  </div>
 
+          <hr />
+          {Array.isArray(messages) ? (
+            messages?.map((mens, index) => (
+              <div key={index}>
+                {mens.sender_id === currentUser ? (
+                  <UserMessage msg={mens} />
+                ) : (
+                  <div className="flex justify-end">
+                    <UserMessageFrom msg={mens} className="flex justify-end" />
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <>No Hay Mensages</>
+          )}
+
+          <form onSubmit={(e) => handleSendMessage(e)}>
+            <div className="flex flex-row items-center m-2">
+              <div className="basis-1.5/12">
+                <button className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="basis-11/12">
+                <input
+                  type="text"
+                  name="message"
+                  id="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="block w-full  px-4 py-1.5 rounded border border-solid border-gray-300 bg-white bg-clip-padding
+           focus:text-gray-700 focus:bg-white focus:border-blue-700 focus:outline-none"
+                  placeholder="New Message"
+                />
+              </div>
+              <div className="basis-1.5/12">
+                <button
+                  type="submit"
+                  className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-8 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

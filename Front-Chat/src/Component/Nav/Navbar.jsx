@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Logo from "../../assets/chat-2389223_640.png";
 import { Link, useNavigate } from "react-router-dom";
 import { logout, useAuthDispatch, useAuthState } from "../../Context";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { io } from "socket.io-client";
 
 export default function Navbar() {
   const dropdownBtnRef1 = useRef(null);
@@ -10,11 +13,13 @@ export default function Navbar() {
   const dropdownBtnRef = useRef(null);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [navbar, setNavbar] = useState(false);
   let { isAuthenticated } = useAuthState();
   const userDetails = useAuthState();
   const navigate = useNavigate();
   const dispatch = useAuthDispatch();
+  const socket = io(import.meta.env.VITE_REACT_APP_URL_LOCAL); // Conectar al servidor WebSocket
 
   const handlelogout = async (e) => {
     e.preventDefault();
@@ -68,6 +73,20 @@ export default function Navbar() {
   const handleDropdownToggle1 = () => {
     setShowDropdown1(!showDropdown1);
   };
+
+  useEffect(() => {
+    console.log(userDetails, "userdetails tiene datos en el usefefct")
+    console.log("ingreso al usefect de navbar")
+    
+    socket.on("new_message", (message) => {
+      // Mostrar notificación de nuevo mensaje
+      console.log(message, "new message notification")
+    });
+
+    return () => {
+      socket.disconnect(); // Desconectar del servidor WebSocket cuando se desmonte el componente
+    };
+  }, []);
   return (
     <nav className="w-full bg-blue-400 shadow">
       <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
@@ -159,6 +178,11 @@ export default function Navbar() {
                   </svg>
                   <span className="ml-2">Message</span>
                 </Link>
+              </li>
+              <li className="text-white hover:text-indigo-200">
+<FontAwesomeIcon icon={faBell}
+className="h-6 w-6 mr-1" />
+<span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs">{unreadMessages}</span>
               </li>
             </ul>
 

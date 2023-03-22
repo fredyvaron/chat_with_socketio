@@ -19,9 +19,12 @@ module.exports = (socket) => {
         console.log(newMessage, "se creo el mensaje");
       }
       const conversationId = conversation.id;
+      const recipientId = conversation.receiver_id
+      console.log(recipientId, "id destinatario")
       const get = await getMesageUser(conversationId);
       console.log(get, "get message")
       socket.to(conversationId).emit("message", get);
+      socket.to(recipientId).emit("new_message", "You have a new message!");
       /* eturn Ok(res, conversation); */
     } catch (error) {
       console.log(error);
@@ -38,6 +41,7 @@ module.exports = (socket) => {
       
         return socket.emit("getmessage", "Not Found");
       }
+      socket.to(data.id).emit("getmessage", get)
       return socket.emit("getmessage", get);
     } catch (error) {
       return socket.emit("getmessage", error);
