@@ -4,15 +4,28 @@ const events = require("./src/sockets/event");
 const http = require("http").createServer(server);
 const io = require("socket.io")(http, { cors: { origin: "*" } });
 const seed = require('./src/seed/seed');
+const { User, Notification} = require('./src/db')
 const { findConversation, createConversation } = require("./src/services/Conversation.service.js");
 const { createMesage, getMesageUser } = require("./src/services/Message.service.js");
+const { createNotificacion, findnameByNotification } = require("./src/services/Notification.service.js");
 
 io.on('connection', (socket) => {
   console.log('Un nuevo usuario se ha conectado');
 
-  socket.on('sendNotification', ( message ) => {
+/*   socket.on('sendNotification', ( message ) => {
     console.log(message.recipientId, 'recipiente id', message.text, 'message');
-    socket.to(message.recipientId).emit('newNotification', message.text); // Enviar la notificación solo al usuario destinatario
+    socket.to(message.recipientId).emit('newNotification', message); // Enviar la notificación solo al usuario destinatario
+  }); */
+  socket.on("sendNotification", async (notification) => {
+    console.log("New notification received", notification);
+    const data = await createNotificacion(notification);
+    console.log(data, "data de notification sent")
+    const search = await findnameByNotification(notification.user_sender)
+    console.log(search, "resiltado de la busqueda por nombre")
+    const joinnee = {...notification, search}
+    console.log(joinnee, "resultado unido con el nombre de usario ")
+    io.to(notification.user_receiver).emit("newNotification", joinnee);
+    
   });
   socket.on("join", (conversationId) => {
     socket.join(conversationId);

@@ -55,7 +55,7 @@ let capsEntries = entries.map((entry) => [
 ]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { User, TypeUser, Message, Conversations } = sequelize.models;
+const { User, TypeUser, Message, Conversations, Notification } = sequelize.models;
 
 TypeUser.hasMany(User);
 User.belongsTo(TypeUser);
@@ -70,6 +70,10 @@ Message.belongsTo(User, { foreignKey: 'receiver_id', as: 'Receiver'  });
 Message.belongsTo(Conversations, { foreignKey: 'conversation_id'});
 Conversations.hasMany(Message, { foreignKey: "conversation_id" ,onDelete: "CASCADE"});
 
+Notification.belongsTo(User, { foreignKey: 'user_sender', as: 'Sender' });
+Notification.belongsTo(User, { foreignKey: 'user_receiver', as: 'Receiver' });
+User.hasMany(Notification, { foreignKey: 'user_sender', as: 'SentNotifications' });
+User.hasMany(Notification, { foreignKey: 'user_receiver', as: 'ReceivedNotifications' });
 
 module.exports = {
   ...sequelize.models,

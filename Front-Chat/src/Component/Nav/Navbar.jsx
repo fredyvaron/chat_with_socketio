@@ -3,7 +3,7 @@ import Logo from "../../assets/chat-2389223_640.png";
 import { Link, useNavigate } from "react-router-dom";
 import { logout, useAuthDispatch, useAuthState } from "../../Context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faUser, faMessage } from "@fortawesome/free-solid-svg-icons";
 import { io } from "socket.io-client";
 
 export default function Navbar() {
@@ -14,13 +14,13 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [notifications, setNotifications] = useState([]); 
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [navbar, setNavbar] = useState(false);
   let { isAuthenticated } = useAuthState();
   const userDetails = useAuthState();
   const navigate = useNavigate();
   const dispatch = useAuthDispatch();
- 
 
   const handlelogout = async (e) => {
     e.preventDefault();
@@ -75,14 +75,15 @@ export default function Navbar() {
     setShowDropdown1(!showDropdown1);
   };
   useEffect(() => {
-    const socket = io.connect('http://localhost:3001'); // Conectar al servidor WebSocket
-  
-    socket.on('connection', () => {
+    const socket = io.connect("http://localhost:3001"); // Conectar al servidor WebSocket
+
+    socket.on("connection", () => {
       console.log(`Conectado con ID ${socket.id}`);
     });
-    console.log(userDetails.user.user)
+    console.log(userDetails.user.user);
     socket.emit("join", userDetails.user.user.id);
-    socket.on('newNotification', (message) => {
+    socket.on("newNotification", (message) => {
+      setNotifications((prevNotifications) => [...prevNotifications, message]);
       setUnreadMessages((prevUnreadMessages) => prevUnreadMessages + 1);
       console.log(`Nueva notificación recibida: ${message}`);
     });
@@ -183,11 +184,6 @@ export default function Navbar() {
                   <span className="ml-2">Message</span>
                 </Link>
               </li>
-              <li className="text-white hover:text-indigo-200">
-<FontAwesomeIcon icon={faBell}
-className="h-6 w-6 mr-1" />
-<span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs">{unreadMessages}</span>
-              </li>
             </ul>
 
             <div className="mt-3 space-y-2 lg:hidden md:inline-block">
@@ -252,6 +248,36 @@ className="h-6 w-6 mr-1" />
               >
                 Logout
               </button>
+              <div className="relative">
+                <button>
+                  <FontAwesomeIcon
+                    icon={faBell}
+                    className="h-6 w-6 mr-1"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                  />
+                  <span className="bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                    {unreadMessages}
+                    {showNotifications}
+                  </span>
+                </button>
+                {showNotifications && (
+                  <ul className="absolute bg-white rounded-md shadow-md mt-2 w-72 list-none z-10">
+                    {notifications.map((notification) => (
+                      <li
+                        key={notification.id}
+                        className="py-2 px-3 hover:bg-gray-100 cursor-pointer"
+                        onClick={()=> navigate(`/messages/${notification.user_sender}`)}
+                      >
+                        <span className="font-bold mr-2">
+                          <FontAwesomeIcon icon={faUser} className="text-gray-500, mr-1"/>{notification.search}
+                           <span className="ml-1 mr-1">-</span>
+                        </span>
+                        <FontAwesomeIcon icon={faMessage} className="text-gray-500 mr-1" /><span>{notification.message}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <div className="relative">
                 <button
                   className="px-4 py-2 ml-4 text-gray-800 bg-white rounded-md shadow hover:bg-gray-100"
