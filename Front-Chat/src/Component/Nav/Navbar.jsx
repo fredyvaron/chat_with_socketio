@@ -14,6 +14,7 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [data, setData] = useState();
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [navbar, setNavbar] = useState(false);
@@ -21,7 +22,7 @@ export default function Navbar() {
   const userDetails = useAuthState();
   const navigate = useNavigate();
   const dispatch = useAuthDispatch();
-
+  const ENDPOINT = import.meta.env.VITE_REACT_APP_URL_LOCAL;
   const handlelogout = async (e) => {
     e.preventDefault();
     await logout(dispatch);
@@ -74,24 +75,46 @@ export default function Navbar() {
   const handleDropdownToggle1 = () => {
     setShowDropdown1(!showDropdown1);
   };
-  useEffect(() => {
-    const socket = io.connect("http://localhost:3001"); // Conectar al servidor WebSocket
 
+  useEffect(() => {
+    const socket = io.connect(ENDPOINT); // Conectar al servidor WebSocket
+    console.log(userDetails, "userdetails usefect");
+    if (userDetails.user === "") return;
     socket.on("connection", () => {
       console.log(`Conectado con ID ${socket.id}`);
     });
     console.log(userDetails.user.user);
     socket.emit("join", userDetails.user.user.id);
+    socket.emit("getNotification", userDetails.user.user.id);
     socket.on("newNotification", (message) => {
       setNotifications((prevNotifications) => [...prevNotifications, message]);
       setUnreadMessages((prevUnreadMessages) => prevUnreadMessages + 1);
+      console.log(JSON.stringify(message));
       console.log(`Nueva notificación recibida: ${message}`);
+    });
+    socket.on("notificationMarkedAsRead", (message) => {
+      console.log(message, "message");
+      setUnreadMessages((prevUnreadMessages) => prevUnreadMessages - 1);
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== message)
+      );
     });
 
     return () => {
       socket.disconnect(); // Desconectar del servidor WebSocket cuando se desmonte el componente
     };
   }, []);
+  const handleclicknotification = (userId, notificationId, userReceiver) => {
+    console.log(userId, "userid");
+    const socket = io.connect(ENDPOINT); // Conectar al servidor WebSocket
+
+    socket.on("connection", () => {
+      console.log(`Conectado con ID ${socket.id}`);
+    });
+    console.log("ingresp a clik notification");
+    socket.emit("markNotificationAsRead", userId, notificationId);
+    navigate(`/messages/${userReceiver}`);
+  };
   return (
     <nav className="w-full bg-blue-400 shadow">
       <div className="justify-between px-4 mx-auto lg:max-w-7xl md:items-center md:flex md:px-8">
@@ -266,13 +289,27 @@ export default function Navbar() {
                       <li
                         key={notification.id}
                         className="py-2 px-3 hover:bg-gray-100 cursor-pointer"
-                        onClick={()=> navigate(`/messages/${notification.user_sender}`)}
+                        onClick={() =>
+                          handleclicknotification(
+                            notification.user_receiver,
+                            notification.id,
+                            notification.user_sender
+                          )
+                        }
                       >
                         <span className="font-bold mr-2">
-                          <FontAwesomeIcon icon={faUser} className="text-gray-500, mr-1"/>{notification.search}
-                           <span className="ml-1 mr-1">-</span>
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-gray-500, mr-1"
+                          />
+                          {notification.SenderUser.nombre}
+                          <span className="ml-1 mr-1">-</span>
                         </span>
-                        <FontAwesomeIcon icon={faMessage} className="text-gray-500 mr-1" /><span>{notification.message}</span>
+                        <FontAwesomeIcon
+                          icon={faMessage}
+                          className="text-gray-500 mr-1"
+                        />
+                        <span>{notification.message}</span>
                       </li>
                     ))}
                   </ul>

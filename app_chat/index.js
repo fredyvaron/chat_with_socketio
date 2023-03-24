@@ -3,29 +3,56 @@ const { conn } = require("./src/db.js");
 const events = require("./src/sockets/event");
 const http = require("http").createServer(server);
 const io = require("socket.io")(http, { cors: { origin: "*" } });
-const seed = require('./src/seed/seed');
-const { User, Notification} = require('./src/db')
-const { findConversation, createConversation } = require("./src/services/Conversation.service.js");
-const { createMesage, getMesageUser } = require("./src/services/Message.service.js");
-const { createNotificacion, findnameByNotification } = require("./src/services/Notification.service.js");
+const seed = require("./src/seed/seed");
+const { User, Notification } = require("./src/db");
+const {
+  findConversation,
+  createConversation,
+} = require("./src/services/Conversation.service.js");
+const {
+  createMesage,
+  getMesageUser,
+} = require("./src/services/Message.service.js");
+const {
+  createNotificacion,
+  findnameByNotification,
+  findReactNotificationsByUser,
+  markNotificationAsRead,
+} = require("./src/services/Notification.service.js");
 
-io.on('connection', (socket) => {
-  console.log('Un nuevo usuario se ha conectado');
+io.on("connection", (socket) => {
+  console.log("Un nuevo usuario se ha conectado");
 
-/*   socket.on('sendNotification', ( message ) => {
+  /*   socket.on('sendNotification', ( message ) => {
     console.log(message.recipientId, 'recipiente id', message.text, 'message');
     socket.to(message.recipientId).emit('newNotification', message); // Enviar la notificación solo al usuario destinatario
   }); */
   socket.on("sendNotification", async (notification) => {
     console.log("New notification received", notification);
     const data = await createNotificacion(notification);
-    console.log(data, "data de notification sent")
-    const search = await findnameByNotification(notification.user_sender)
-    console.log(search, "resiltado de la busqueda por nombre")
-    const joinnee = {...notification, search}
-    console.log(joinnee, "resultado unido con el nombre de usario ")
-    io.to(notification.user_receiver).emit("newNotification", joinnee);
-    
+    console.log(data, "data de notification sent");
+    notification.user_receiver
+
+    /* const notifications = await findReactNotificationsByUser(notification.user_receiver); */
+    io.to(notification.user_receiver).emit("newNotification", data);
+  });
+  socket.on("getNotification", async (userId) => {
+    console.log(`User ${userId} logged in`);
+    // buscar notificaciones pendientes y enviarlas al usuario
+    const notifications = await findReactNotificationsByUser(userId);
+    notifications.forEach((notification) => {
+      io.to(userId).emit("newNotification", notification);
+    });
+  });
+  socket.on("markNotificationAsRead", async (userID, notificationId) => {
+    try {
+      console.log(userID, "userId", notificationId, "NotificationId");
+      const result = await markNotificationAsRead(notificationId);
+      console.log(`Notification ${notificationId} marked as read`);
+      io.to(userID).emit("notificationMarkedAsRead", notificationId);
+    } catch (error) {
+      console.error(error);
+    }
   });
   socket.on("join", (conversationId) => {
     socket.join(conversationId);
@@ -64,15 +91,13 @@ io.on('connection', (socket) => {
       return socket.emit("getmessage", error);
     }
   });
-  socket.on('disconnect', () => {
-    console.log('El usuario se ha desconectado');
+  socket.on("disconnect", () => {
+    console.log("El usuario se ha desconectado");
   });
 });
 conn.sync({ force: false }).then(async () => {
   await seed();
   http.listen(process.env.PORT || 3003, () => {
-    console.log(
-      `server running`
-    );
+    console.log(`server running`);
   });
 });

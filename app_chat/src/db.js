@@ -70,8 +70,8 @@ Message.belongsTo(User, { foreignKey: 'receiver_id', as: 'Receiver'  });
 Message.belongsTo(Conversations, { foreignKey: 'conversation_id'});
 Conversations.hasMany(Message, { foreignKey: "conversation_id" ,onDelete: "CASCADE"});
 
-Notification.belongsTo(User, { foreignKey: 'user_sender', as: 'Sender' });
-Notification.belongsTo(User, { foreignKey: 'user_receiver', as: 'Receiver' });
+Notification.belongsTo(User, { foreignKey: 'user_sender', as: 'SenderUser' });
+Notification.belongsTo(User, { foreignKey: 'user_receiver', as: 'ReceiverUser' });
 User.hasMany(Notification, { foreignKey: 'user_sender', as: 'SentNotifications' });
 User.hasMany(Notification, { foreignKey: 'user_receiver', as: 'ReceivedNotifications' });
 
