@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { login, useAuthDispatch, useAuthState } from "../../Context";
+import LoadingLogin from "../Loading/LoadingLogin";
 import { showToast } from "../Notification/Toast";
 export default function Login() {
   const dispatch = useAuthDispatch()
@@ -21,7 +22,6 @@ export default function Login() {
       let response = await login(dispatch, user)
       if(!response) return;
       navigate("/")
-      window.location.reload()
     } catch (error) {
       console.log(error)
     }
@@ -35,12 +35,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-          {loading && (
-      <div className="fixed top-0 bottom-0 left-0 right-0 flex justify-center items-center bg-gray-200 opacity-75 z-50">
-        <BeatLoader color="#cacaca" loading={true} size={20} />
-        <span className="ml-2 font-bold text-gray-500">Loading...</span>
-      </div>
-    )}
+          {loading && <LoadingLogin/>}
       <div className="px-8 py-6 mt-4 text-left bg-gray-100  shadow-lg">
         <h2 className="text-center text-2xl mb-4">Login</h2>
   
