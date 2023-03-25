@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { REQUEST_lOGIN } from "../Context/actions";
 export const local_url = import.meta.env.VITE_REACT_APP_URL_LOCAL;
 import { updateUserSuccess } from "../Context/actions";
 let { user } = localStorage.getItem("user")
@@ -23,17 +22,13 @@ export const reducerSlice = createSlice({
     deleteConversationError: null,
   },
   reducers: {
-    RREQUEST_lOGIN(state) {
+    RREQUEST_ALL_USER(state) {
       return { ...state, islogging: true, errorMessage: null };
     },
     GET_ALL_USERS_SUCCESS(state, action) {
-      const filteredUsers = action.payload.filter(
-        (users) => users.id !== user.id
-      );
-
       return {
         ...state,
-        users: filteredUsers,
+        users: action.payload,
         islogging: false,
         errorMessage: null,
       };
@@ -115,16 +110,26 @@ const getAuthHeaders = () => {
 export const get_all_users = () => {
   return async (dispatch) => {
     try {
-      dispatch({ type: REQUEST_lOGIN });
+      dispatch({ type: RREQUEST_ALL_USER });
+      let { user } = localStorage.getItem("user")
+        ? JSON.parse(localStorage.getItem("user"))
+        : "";
+      console.log(getAuthHeaders(), "headers");
       const { data } = await axios.get(`${local_url}/user`, {
         headers: getAuthHeaders(),
       });
       if (data) {
-        dispatch({ type: GET_ALL_USERS_SUCCESS, payload: data.data });
+        const filteredUsers = data.data.filter(
+          (users) => users && users.id !== user.id
+        );
+        console.log(filteredUsers, "usuarios filtrados")
+        dispatch({ type: GET_ALL_USERS_SUCCESS, payload: filteredUsers });
         return data.data;
       }
+      console.log(data, "error de data");
       dispatch({ type: GET_ALL_USERS_ERROR, error: data.error.message });
     } catch (error) {
+      console.log(error, "error de catch");
       dispatch({ type: GET_ALL_USERS_ERROR, error: error.message });
     }
   };
@@ -197,7 +202,7 @@ export const deletconversation = (id) => {
 export const {
   GET_ALL_USERS_ERROR,
   GET_ALL_USERS_SUCCESS,
-  RREQUEST_lOGIN,
+  RREQUEST_ALL_USER,
   SEARCH_USER_BY_NAME,
   SEARCH_USER_BY_NAME_ERROR,
   GET_PROFILE,

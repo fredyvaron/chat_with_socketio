@@ -69,7 +69,6 @@ export async function logout(dispatch) {
   window.localStorage.removeItem("token");
   window.localStorage.removeItem("user");
   window.localStorage.removeItem("isAuthenticated");
-  window.location.reload();
   window.location.href = "/login";
   return true;
 }

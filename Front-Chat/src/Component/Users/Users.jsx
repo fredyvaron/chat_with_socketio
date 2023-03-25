@@ -14,6 +14,7 @@ export default function Users({ onUserSelection }) {
 
   const dispatch = useDispatch();
   const users = useSelector((state) => state.data.users);
+  console.log(users, "all user de users")
   useEffect(() => {
     setLoading(true);
     dispatch(get_all_users()).then(() => {

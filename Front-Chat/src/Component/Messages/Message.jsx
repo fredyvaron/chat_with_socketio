@@ -16,7 +16,7 @@ export default function Message() {
     user2: selectedUser,
     user1: userDetails.user.user.id,
   };
-
+console.log(userDetails, "detalles de usuario")
   const handleUserSelection = (userId) => {
     setSelectedUser(userId);
     console.log("selected user", selectedUser);

@@ -80,6 +80,7 @@ export default function Navbar() {
     const socket = io.connect(ENDPOINT); // Conectar al servidor WebSocket
     console.log(userDetails, "userdetails usefect");
     if (userDetails.user === "") return;
+    console.log(userDetails, "user")
     socket.on("connection", () => {
       console.log(`Conectado con ID ${socket.id}`);
     });

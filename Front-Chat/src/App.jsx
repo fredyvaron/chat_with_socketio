@@ -13,6 +13,7 @@ import Home from "./Home";
 import PrivateRoute from "./utils/PrivateRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Perfil from "./Component/Users/Perfil";
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
             <Route element={<PrivateRoute />}>
               <Route path="/" element={<Home />} />
               <Route path="/messages/:idUser?" element={<Message />} />
-              <Route path="/profile" element={<PerfilWithContext />} />
+              <Route path="/profile" element={<Perfil />} />
               <Route path="/profiles/:id" element={<Profiles />} />
             </Route>
             <Route path="/about" element={<About />} />
