@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEllipsis,
+  faPaperPlane,
+  faSpinner,
+  faRepeat
+} from "@fortawesome/free-solid-svg-icons";
 import Message from "../Messages/Message";
 import NewMessage from "../Messages/NewMessage";
 import UserMessage from "../Messages/UserMessage";
@@ -33,6 +38,7 @@ export default function Conversation({
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
+  const [messageStatus, setMessageStatus] = useState(null);
   const navigate = useNavigate();
   const loadingdeleteConversation = useSelector(
     (state) => state.data.loadingDeleteCon
@@ -103,7 +109,43 @@ export default function Conversation({
   }, [deletesuccesConversation]);
   const handleSendMessage = (e) => {
     e.preventDefault();
-    console.log("seleccion enviar mensaje");
+    setMessageStatus("sending");
+    if (navigator.onLine) {
+      console.log("seleccion enviar mensaje");
+      const body = {
+        idconversation,
+        message,
+        user2: selectedUserId,
+        user1: userDetaile.user.user.id,
+        sender_id: userDetaile.user.user.id,
+        receiver_id: selectedUserId,
+      };
+      console.log(body, "body de send message");
+      socket.emit("message", body, (response) => {
+        console.log(response, "body de send message response");
+        if (response && response.error) {
+          console.log("error:", response.error);
+          // handle error
+          setMessageStatus("retry");
+        } else {
+          console.log("message send");
+          // update message status
+          setMessageStatus("send");
+          setMessage("");
+        }
+      });
+      const notification = {
+        text: "Tienes una nueva notificación",
+        user_receiver: selectedUserId,
+        user_sender: userDetaile.user.user.id,
+        message,
+      }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
+      socket.emit("sendNotification", notification);
+    } else {
+      console.log("El navegador está desconectado");
+      setMessageStatus("retry");
+    }
+    /*     console.log("seleccion enviar mensaje");
     const body = {
       idconversation,
       message,
@@ -112,12 +154,47 @@ export default function Conversation({
       sender_id: userDetaile.user.user.id,
       receiver_id: selectedUserId,
     };
-    console.log(body, "body de send message");
-    socket.emit("message", body);
+    console.log(body, "body de send message"); */
+
+    /*     socket.emit("message", body);
     const notification = { text: 'Tienes una nueva notificación', user_receiver: selectedUserId, user_sender: userDetaile.user.user.id, message}; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
     console.log('Notificación', notification)
-    socket.emit('sendNotification', notification ); // Enviar la notificación al servidor
-    setMessage("");
+    socket.emit('sendNotification', notification ); */
+
+    /*     socket.emit("message", (body) => {
+      try {
+        setMessageStatus("send");
+        setMessage("");
+      } catch (error) {
+        console.log(error);
+        socket.emit("message", {
+          error,
+        });
+        setMessageStatus("retry");
+      }
+    }); */
+    /*     const notification = {
+      text: "Tienes una nueva notificación",
+      user_receiver: selectedUserId,
+      user_sender: userDetaile.user.user.id,
+      message,
+    }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
+    socket.emit("sendNotification", notification, (response) => {
+      try {
+        console.log("Notificación", notification);
+        if (response.error) {
+          console.log("Error al enviar mensaje: ", response.error);
+          setMessageStatus("retry");
+        } else {
+          console.log("todo bien");
+          setMessageStatus("send");
+          setMessage("");
+        }
+      } catch (error) {
+        console.log(error);
+        setMessageStatus("retry");
+      }
+    }); */
   };
   const handaboutprofile = () => {
     console.log(selectedUserId, "selectedUserId");
@@ -291,25 +368,26 @@ export default function Conversation({
                 />
               </div>
               <div className="basis-1.5/12">
-                <button
-                  type="submit"
-                  className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-8 h-6"
+                {messageStatus === "retry" ? (
+                  <button
+                    type="submit"
+                    className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                    />
-                  </svg>
-                </button>
+                    <FontAwesomeIcon icon={faRepeat} />
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
+                    disabled={messageStatus === "sending"}
+                  >
+                    {messageStatus === "sending" ? (
+                      <FontAwesomeIcon icon={faSpinner} spin />
+                    ) : (
+                      <FontAwesomeIcon icon={faPaperPlane} />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </form>

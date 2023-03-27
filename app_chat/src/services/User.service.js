@@ -40,7 +40,7 @@ const searchByUser = async (name) => {
   return await User.findAll({
     where: {
       nombre: {
-        [Op.like]: `%${name}%`,
+        [Op.iLike]: `%${name}%`,
       },
     },
     limit: 5,

@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
     console.log("New notification received", notification);
     const data = await createNotificacion(notification);
     console.log(data, "data de notification sent");
-    notification.user_receiver
+    notification.user_receiver;
 
     /* const notifications = await findReactNotificationsByUser(notification.user_receiver); */
     io.to(notification.user_receiver).emit("newNotification", data);
@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
   socket.on("join", (conversationId) => {
     socket.join(conversationId);
   });
-  socket.on("message", async (body) => {
+  socket.on("message", async (body, callback) => {
     try {
       let conversation = await findConversation(body);
       if (!conversation) {
@@ -71,12 +71,10 @@ io.on("connection", (socket) => {
       const get = await getMesageUser(conversationId);
       socket.to(conversationId).emit("message", get);
       socket.to(recipientId).emit("new_message", "You have a new message!");
-      /* eturn Ok(res, conversation); */
+      callback(null, get); // call the callback function with the response
     } catch (error) {
       console.log(error);
-      socket.broadcast.emit("message", {
-        error,
-      });
+      callback(error); // call the callback function with the error
     }
   });
   socket.on("getmessage", async (data) => {
