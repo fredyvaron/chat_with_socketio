@@ -20,6 +20,10 @@ module.exports = (sequelize) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
+            conversation_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+              },
             read: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,

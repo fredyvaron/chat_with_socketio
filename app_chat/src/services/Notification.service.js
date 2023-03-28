@@ -24,6 +24,7 @@ const findnameByNotification = async (id) => {
   });
   return search.nombre;
 };
+
 const findReactNotificationsByUser = async (id) => {
   const notification = await db.Notification.findAll({
     where: {
@@ -45,8 +46,13 @@ const findReactNotificationsByUser = async (id) => {
   });
   return notification;
 };
-
-const markNotificationAsRead = async(notificationId) => {
+const findNotificationByConversation = async(id, user) => { 
+  console.log(id, user)
+  const notification = await db.Notification.findAll({where: { conversation_id: id, user_receiver:user}})
+  console.log(notification, "service notification")
+  return notification
+}
+const markNotificationAsReading = async(notificationId) => {
   console.log(notificationId, "Marking notification as read")
   const notification = await db.Notification.findByPk(notificationId);
   if(notification){
@@ -60,5 +66,6 @@ module.exports = {
   createNotificacion,
   findnameByNotification,
   findReactNotificationsByUser,
-  markNotificationAsRead,
+  markNotificationAsReading,
+  findNotificationByConversation
 };

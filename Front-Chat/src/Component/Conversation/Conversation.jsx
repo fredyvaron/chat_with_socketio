@@ -38,7 +38,8 @@ export default function Conversation({
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
-  const [messageStatus, setMessageStatus] = useState(null);
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState(null);
   const navigate = useNavigate();
   const loadingdeleteConversation = useSelector(
     (state) => state.data.loadingDeleteCon
@@ -95,6 +96,12 @@ export default function Conversation({
       setIsLoading(false);
       console.log(message, "message of conversation useefect getmessage");
     });
+    const readnotification = {
+      userId: userDetaile.user.user.id,
+      conversationId: idconversation
+    }
+    console.log(readnotification, "readnotification");
+    socket.emit("conversationRead", readnotification.userId, readnotification.conversationId )
     return () => {
       socket.off("message");
     };
@@ -107,9 +114,8 @@ export default function Conversation({
       setMessages([]);
     }
   }, [deletesuccesConversation]);
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async(e) => {
     e.preventDefault();
-    setMessageStatus("sending");
     if (navigator.onLine) {
       console.log("seleccion enviar mensaje");
       const body = {
@@ -121,80 +127,43 @@ export default function Conversation({
         receiver_id: selectedUserId,
       };
       console.log(body, "body de send message");
-      socket.emit("message", body, (response) => {
-        console.log(response, "body de send message response");
-        if (response && response.error) {
-          console.log("error:", response.error);
-          // handle error
-          setMessageStatus("retry");
-        } else {
-          console.log("message send");
-          // update message status
-          setMessageStatus("send");
+      setIsSending(true);
+        try {
+          const messages = await socket.emit("message", body );
+          console.log(messages);
+          // Actualizar los estados correspondientes
           setMessage("");
+          setSendError(null);
+          setIsSending(false)
+          console.log(isLoading, "isloading")
+        } catch (error) {
+          console.error(error);
+          setSendError(response.error);
+          setIsSending(false)
+          // Actualizar el estado de error correspondiente
         }
-      });
+      setIsSending(false)
       const notification = {
         text: "Tienes una nueva notificación",
         user_receiver: selectedUserId,
         user_sender: userDetaile.user.user.id,
         message,
+        conversation_id: idconversation,
       }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
+
       socket.emit("sendNotification", notification);
+      
     } else {
       console.log("El navegador está desconectado");
-      setMessageStatus("retry");
+      setSendError("El Navegador está desconectado, intente de nuevo")
     }
-    /*     console.log("seleccion enviar mensaje");
-    const body = {
-      idconversation,
-      message,
-      user2: selectedUserId,
-      user1: userDetaile.user.user.id,
-      sender_id: userDetaile.user.user.id,
-      receiver_id: selectedUserId,
-    };
-    console.log(body, "body de send message"); */
-
-    /*     socket.emit("message", body);
-    const notification = { text: 'Tienes una nueva notificación', user_receiver: selectedUserId, user_sender: userDetaile.user.user.id, message}; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
-    console.log('Notificación', notification)
-    socket.emit('sendNotification', notification ); */
-
-    /*     socket.emit("message", (body) => {
-      try {
-        setMessageStatus("send");
-        setMessage("");
-      } catch (error) {
-        console.log(error);
-        socket.emit("message", {
-          error,
-        });
-        setMessageStatus("retry");
-      }
-    }); */
-    /*     const notification = {
-      text: "Tienes una nueva notificación",
-      user_receiver: selectedUserId,
-      user_sender: userDetaile.user.user.id,
-      message,
-    }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
-    socket.emit("sendNotification", notification, (response) => {
-      try {
-        console.log("Notificación", notification);
-        if (response.error) {
-          console.log("Error al enviar mensaje: ", response.error);
-          setMessageStatus("retry");
-        } else {
-          console.log("todo bien");
-          setMessageStatus("send");
-          setMessage("");
-        }
-      } catch (error) {
-        console.log(error);
-        setMessageStatus("retry");
-      }
-    }); */
+  };
+  const retrySend = (e) => {
+    e.preventDefault();
+    setIsSending(false);
+    setSendError(null);
+    const simulatedEvent = { preventDefault: () => {} };
+    handleSendMessage(simulatedEvent);
   };
   const handaboutprofile = () => {
     console.log(selectedUserId, "selectedUserId");
@@ -334,8 +303,8 @@ export default function Conversation({
           ) : (
             <>No Hay Mensages</>
           )}
-
-          <form onSubmit={(e) => handleSendMessage(e)}>
+<div>
+<form onSubmit={(e) => handleSendMessage(e)}>
             <div className="flex flex-row items-center m-2">
               <div className="basis-1.5/12">
                 <button className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center">
@@ -368,29 +337,27 @@ export default function Conversation({
                 />
               </div>
               <div className="basis-1.5/12">
-                {messageStatus === "retry" ? (
-                  <button
-                    type="submit"
-                    className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
-                  >
-                    <FontAwesomeIcon icon={faRepeat} />
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    className="items-center border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
-                    disabled={messageStatus === "sending"}
-                  >
-                    {messageStatus === "sending" ? (
-                      <FontAwesomeIcon icon={faSpinner} spin />
-                    ) : (
-                      <FontAwesomeIcon icon={faPaperPlane} />
-                    )}
-                  </button>
-                )}
+              {sendError ? (
+  <div>
+    <button onClick={retrySend}><FontAwesomeIcon icon={faRepeat}/></button>
+  </div>
+) : (
+  <button disabled={isSending} onClick={handleSendMessage}>
+    <span>
+      {isSending ? (
+        <FontAwesomeIcon icon={faSpinner} spin />
+      ) : (
+        <FontAwesomeIcon icon={faPaperPlane} />
+      )}
+    </span>
+  </button>
+)}
+                
               </div>
             </div>
           </form>
+</div>
+
         </div>
       </div>
     </div>

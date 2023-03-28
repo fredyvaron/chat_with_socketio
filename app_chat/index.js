@@ -17,7 +17,8 @@ const {
   createNotificacion,
   findnameByNotification,
   findReactNotificationsByUser,
-  markNotificationAsRead,
+  markNotificationAsReading,
+  findNotificationByConversation,
 } = require("./src/services/Notification.service.js");
 
 io.on("connection", (socket) => {
@@ -31,8 +32,6 @@ io.on("connection", (socket) => {
     console.log("New notification received", notification);
     const data = await createNotificacion(notification);
     console.log(data, "data de notification sent");
-    notification.user_receiver;
-
     /* const notifications = await findReactNotificationsByUser(notification.user_receiver); */
     io.to(notification.user_receiver).emit("newNotification", data);
   });
@@ -47,9 +46,26 @@ io.on("connection", (socket) => {
   socket.on("markNotificationAsRead", async (userID, notificationId) => {
     try {
       console.log(userID, "userId", notificationId, "NotificationId");
-      const result = await markNotificationAsRead(notificationId);
+      const result = await markNotificationAsReading(notificationId);
       console.log(`Notification ${notificationId} marked as read`);
       io.to(userID).emit("notificationMarkedAsRead", notificationId);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+  socket.on("conversationRead", async (userId, conversationId) => {
+    console.log(userId, conversationId, "datos para ller la notificacion");
+    try {
+      const notifications = await findNotificationByConversation(conversationId, userId);
+      console.log(notifications, "ingreso a conversation read");
+      if (notifications) {
+        for (let i = 0; i < notifications.length; i++) {
+          const notification = notifications[i];
+          await markNotificationAsReading(notification.id);
+          console.log(`Notification ${notification.id} marked as read and deleted`);
+          io.to(userId).emit("notificationDeleted", notification.id);
+        }
+      }
     } catch (error) {
       console.error(error);
     }
@@ -57,7 +73,7 @@ io.on("connection", (socket) => {
   socket.on("join", (conversationId) => {
     socket.join(conversationId);
   });
-  socket.on("message", async (body, callback) => {
+/*   socket.on("message", async (body, callback) => {
     try {
       let conversation = await findConversation(body);
       if (!conversation) {
@@ -70,11 +86,40 @@ io.on("connection", (socket) => {
       const recipientId = conversation.receiver_id;
       const get = await getMesageUser(conversationId);
       socket.to(conversationId).emit("message", get);
-      socket.to(recipientId).emit("new_message", "You have a new message!");
       callback(null, get); // call the callback function with the response
     } catch (error) {
       console.log(error);
       callback(error); // call the callback function with the error
+    }
+  }); */
+  socket.on("message", async (body) => {
+    try {
+      // Validar la entrada
+      if (!body || !body.message) {
+        throw new Error("Invalid input");
+      }
+  
+      // Buscar o crear la conversación
+      let conversation = await findConversation(body) || await createConversation(body);
+  
+      // Crear el nuevo mensaje
+      const newMessage = await createMesage(body, conversation.id);
+  
+      // Emitir eventos a los clientes
+      const conversationId = conversation.id;
+      const recipientId = conversation.receiver_id;
+      const messages = await getMesageUser(conversationId);
+      console.log(messages, "resultado de enviar el message esto es lo que va a emitir");
+      socket.to(conversationId).emit("message", messages);
+      socket.to(recipientId).emit("new_message", "You have a new message!");
+  
+      // Devolver la respuesta como una promesa resuelta
+      return messages;
+    } catch (error) {
+      console.error(error);
+  
+      // Devolver la respuesta de error como una promesa rechazada
+      throw new Error("Something went wrong");
     }
   });
   socket.on("getmessage", async (data) => {

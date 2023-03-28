@@ -80,7 +80,7 @@ export default function Navbar() {
     const socket = io.connect(ENDPOINT); // Conectar al servidor WebSocket
     console.log(userDetails, "userdetails usefect");
     if (userDetails.user === "") return;
-    console.log(userDetails, "user")
+    console.log(userDetails, "user");
     socket.on("connection", () => {
       console.log(`Conectado con ID ${socket.id}`);
     });
@@ -95,9 +95,25 @@ export default function Navbar() {
     });
     socket.on("notificationMarkedAsRead", (message) => {
       console.log(message, "message");
-      setUnreadMessages((prevUnreadMessages) => prevUnreadMessages - 1);
+            setUnreadMessages((prevUnreadMessages) =>
+        Math.max(prevUnreadMessages - 1, 0)
+      );
       setNotifications((prevNotifications) =>
         prevNotifications.filter((notification) => notification.id !== message)
+      );
+    });
+    // Escuchar el evento "notificationDeleted"
+    socket.on("notificationDeleted", (notificationId) => {
+      console.log(`Notificación ${notificationId} eliminada`);
+      // Actualizar el estado de las notificaciones para que elimine la notificación marcada como leída
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter(
+          (notification) => notification.id !== notificationId
+        )
+      );
+      // Actualizar el número de mensajes no leídos
+      setUnreadMessages((prevUnreadMessages) =>
+        Math.max(prevUnreadMessages - 1, 0)
       );
     });
 

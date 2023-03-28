@@ -2,6 +2,7 @@ const { Op, or } = require("sequelize");
 const db = require("../db");
 
 const findConversation = async (body) => {
+  console.log(body, "body de buscar conversacion")
   return await db.Conversations.findOne({
     where: {
       user1: { [Op.or]: [body.user1, body.user2] },
@@ -17,6 +18,7 @@ const getConversationUser = async (user) => {
   return await data;
 };
 const createConversation = async (body) => {
+  console.log(body, "body de crear la conversacion")
   return await db.Conversations.create({
     user1: body.user1,
     user2: body.user2,

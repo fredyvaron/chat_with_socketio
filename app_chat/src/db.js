@@ -75,6 +75,8 @@ Notification.belongsTo(User, { foreignKey: 'user_receiver', as: 'ReceiverUser' }
 User.hasMany(Notification, { foreignKey: 'user_sender', as: 'SentNotifications' });
 User.hasMany(Notification, { foreignKey: 'user_receiver', as: 'ReceivedNotifications' });
 
+Notification.belongsTo(Conversations, { foreignKey: "conversation_id" });
+Conversations.hasMany(Notification, { foreignKey: "conversation_id" });
 module.exports = {
   ...sequelize.models,
   conn: sequelize,
