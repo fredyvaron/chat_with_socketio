@@ -4,7 +4,7 @@ import {
   faEllipsis,
   faPaperPlane,
   faSpinner,
-  faRepeat
+  faRepeat,
 } from "@fortawesome/free-solid-svg-icons";
 import Message from "../Messages/Message";
 import NewMessage from "../Messages/NewMessage";
@@ -98,10 +98,14 @@ export default function Conversation({
     });
     const readnotification = {
       userId: userDetaile.user.user.id,
-      conversationId: idconversation
-    }
+      conversationId: idconversation,
+    };
     console.log(readnotification, "readnotification");
-    socket.emit("conversationRead", readnotification.userId, readnotification.conversationId )
+    socket.emit(
+      "conversationRead",
+      readnotification.userId,
+      readnotification.conversationId
+    );
     return () => {
       socket.off("message");
     };
@@ -114,7 +118,7 @@ export default function Conversation({
       setMessages([]);
     }
   }, [deletesuccesConversation]);
-  const handleSendMessage = async(e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (navigator.onLine) {
       console.log("seleccion enviar mensaje");
@@ -128,21 +132,21 @@ export default function Conversation({
       };
       console.log(body, "body de send message");
       setIsSending(true);
-        try {
-          const messages = await socket.emit("message", body );
-          console.log(messages);
-          // Actualizar los estados correspondientes
-          setMessage("");
-          setSendError(null);
-          setIsSending(false)
-          console.log(isLoading, "isloading")
-        } catch (error) {
-          console.error(error);
-          setSendError(response.error);
-          setIsSending(false)
-          // Actualizar el estado de error correspondiente
-        }
-      setIsSending(false)
+      try {
+        const messages = await socket.emit("message", body);
+        console.log(messages);
+        // Actualizar los estados correspondientes
+        setMessage("");
+        setSendError(null);
+        setIsSending(false);
+        console.log(isLoading, "isloading");
+      } catch (error) {
+        console.error(error);
+        setSendError(response.error);
+        setIsSending(false);
+        // Actualizar el estado de error correspondiente
+      }
+      setIsSending(false);
       const notification = {
         text: "Tienes una nueva notificación",
         user_receiver: selectedUserId,
@@ -152,10 +156,9 @@ export default function Conversation({
       }; // Crear un objeto de notificación con el texto de la notificación y el ID del destinatario
 
       socket.emit("sendNotification", notification);
-      
     } else {
       console.log("El navegador está desconectado");
-      setSendError("El Navegador está desconectado, intente de nuevo")
+      setSendError("El Navegador está desconectado, intente de nuevo");
     }
   };
   const retrySend = (e) => {
@@ -187,7 +190,7 @@ export default function Conversation({
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target)
       ) {
-        showDropdown(false);
+        setShowDropdown(false);
       }
     };
 
@@ -213,7 +216,6 @@ export default function Conversation({
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
   const handleDropdownToggle = () => {
     setShowDropdown(!showDropdown);
   };
@@ -225,69 +227,76 @@ export default function Conversation({
   }
   console.log(message, "mensajes");
   return (
-    <div className="h-auto max-h-full overflow-y-auto">
-      <div>
-        <div className="h-5/6 overflow-y-auto">
-          <div className="flex flex-row">
-            <div className="flex flex-row" style={{ flexGrow: 5 }}>
-              {getprofile ? <UserDetail User={getprofile} /> : <Loading />}
-            </div>
-            <div
-              className="flex flex-row-reverse pr-3 pt-3 pb-2 "
-              style={{ flexGrow: 1 }}
-            >
-              <button
-                className=""
-                ref={dropdownBtnRef}
-                onClick={handleDropdownToggle}
-              >
-                <FontAwesomeIcon
-                  icon={faEllipsis}
-                  className="h-10 w-10  text-black rounded-full  transition duration-500 ease-in-out  hover:scale-125 hover:bg-slate-400"
-                />
-              </button>
-              {showDropdown && (
-                <div
-                  className="absolute right-0 mt-12 w-60 p-4"
-                  ref={dropdownRef}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ul className=" bg-white list-none  rounded-lg shadow-2xl z-10">
-                    <li
-                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteUser();
-                      }}
-                    >
-                      Cerrar Chat
-                    </li>
-                    <li
-                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handledeleConversation();
-                      }}
-                      disabled={deleted}
-                    >
-                      Borrar Conversacion
-                    </li>
-                    <li
-                      className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handaboutprofile();
-                      }}
-                    >
-                      Informacion Del Contacto
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
+    <div>
+      {/* inicio compontente conversation  */}
+      <div className="h-full flex flex-col">
+        {/* Inicio detalle perfil */}
+        <div className="flex flex-row">
+          <div className="flex flex-row" style={{ flexGrow: 5 }}>
+            {getprofile ? <UserDetail User={getprofile} /> : <Loading />}
           </div>
+          <div
+            className="flex flex-row-reverse pr-3 pt-3 pb-2 "
+            style={{ flexGrow: 1 }}
+          >
+            <button
+              className=""
+              ref={dropdownBtnRef}
+              onClick={handleDropdownToggle}
+            >
+              <FontAwesomeIcon
+                icon={faEllipsis}
+                className="h-10 w-10  text-black rounded-full  transition duration-500 ease-in-out  hover:scale-125 hover:bg-slate-400"
+              />
+            </button>
+            {showDropdown && (
+              <div
+                className="absolute right-0 mt-12 w-60 p-4"
+                ref={dropdownRef}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ul className=" bg-white list-none  rounded-lg shadow-2xl z-10">
+                  <li
+                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteUser();
+                    }}
+                  >
+                    Cerrar Chat
+                  </li>
+                  <li
+                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handledeleConversation();
+                    }}
+                    disabled={deleted}
+                  >
+                    Borrar Conversacion
+                  </li>
+                  <li
+                    className="px-2 py-2 w-full cursor-pointer hover:bg-slate-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handaboutprofile();
+                    }}
+                  >
+                    Informacion Del Contacto
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* fin detalle perfil */}
+        <hr />
 
-          <hr />
+        {/* Sección de mensajes */}
+        <div
+          className="flex-grow overflow-y-auto h-full"
+          style={{ maxHeight: "65vh" }}
+        >
           {Array.isArray(messages) ? (
             messages?.map((mens, index) => (
               <div key={index}>
@@ -301,10 +310,14 @@ export default function Conversation({
               </div>
             ))
           ) : (
-            <>No Hay Mensages</>
+            <>No hay mensajes</>
           )}
-<div>
-<form onSubmit={(e) => handleSendMessage(e)}>
+  
+        </div>
+        {/* Formulario de envío de mensajes */}
+        {/* Inicio Formulario envio mensaje */}
+        <div>
+          <form onSubmit={(e) => handleSendMessage(e)}>
             <div className="flex flex-row items-center m-2">
               <div className="basis-1.5/12">
                 <button className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center">
@@ -337,28 +350,35 @@ export default function Conversation({
                 />
               </div>
               <div className="basis-1.5/12">
-              {sendError ? (
-  <div>
-    <button onClick={retrySend}><FontAwesomeIcon icon={faRepeat}/></button>
-  </div>
-) : (
-  <button disabled={isSending} onClick={handleSendMessage}>
-    <span>
-      {isSending ? (
-        <FontAwesomeIcon icon={faSpinner} spin />
-      ) : (
-        <FontAwesomeIcon icon={faPaperPlane} />
-      )}
-    </span>
-  </button>
-)}
-                
+                {sendError ? (
+                  <div>
+                    <button
+                      onClick={retrySend}
+                      className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
+                    >
+                      <FontAwesomeIcon icon={faRepeat} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    disabled={isSending}
+                    onClick={handleSendMessage}
+                    className="border-solid hover:bg-sky-300 py-2 px-6 border border-blue hover:border-transparent rounded place-content-center"
+                  >
+                    <span>
+                      {isSending ? (
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                      ) : (
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                      )}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           </form>
-</div>
-
         </div>
+        {/* Fin Formulario envio nuevo mensaje */}
       </div>
     </div>
   );
