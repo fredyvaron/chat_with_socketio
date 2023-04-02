@@ -130,7 +130,7 @@ export default function Navbar() {
     });
     console.log("ingresp a clik notification");
     socket.emit("markNotificationAsRead", userId, notificationId);
-    navigate(`/messages/${userReceiver}`);
+    navigate(`/${userReceiver}`);
   };
   return (
     <nav className="w-full bg-blue-400 shadow">
@@ -207,7 +207,7 @@ export default function Navbar() {
                 Contact US
               </li>
               <li className="text-white hover:text-indigo-200">
-                <Link to={"/messages"} className="flex items-center">
+                <Link to={"/"} className="flex items-center">
                   <svg
                     class="h-8 w-8 text-white"
                     fill="none"

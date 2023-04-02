@@ -24,8 +24,7 @@ function App() {
         <div className="flex-grow mb-0">
           <Routes>
             <Route element={<PrivateRoute />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/messages/:idUser?" element={<Message />} />
+              <Route path="/:idUser?" element={<Message />} />
               <Route path="/profile" element={<Perfil />} />
               <Route path="/profiles/:id" element={<Profiles />} />
             </Route>

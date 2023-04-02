@@ -20,7 +20,7 @@ const Profiles = () => {
     fechaFormateada = format(new Date(profile.createdAt), "'se unió el' dd 'de' MMMM 'del' yyyy", {locale: es});
   }
   const handleSendMessage = () => {
-    navigate(`/messages/${id}`); // Redirigir al componente Message con el ID seleccionado
+    navigate(`/${id}`); // Redirigir al componente Message con el ID seleccionado
   }
   return (
     <div className=" mt-4 w-full mx-auto sm:w-4/5">

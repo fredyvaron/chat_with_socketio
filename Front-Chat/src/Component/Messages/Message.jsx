@@ -5,6 +5,7 @@ import Conversation from "../Conversation/Conversation";
 import { useParams } from "react-router-dom";
 import { useAuthState } from "../../Context/";
 import { getidconversation } from "../../utils/service";
+import Search from "../Search/Search";
 
 export default function Message() {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -16,7 +17,7 @@ export default function Message() {
     user2: selectedUser,
     user1: userDetails.user.user.id,
   };
-console.log(userDetails, "detalles de usuario")
+  console.log(userDetails, "detalles de usuario");
   const handleUserSelection = (userId) => {
     setSelectedUser(userId);
     console.log("selected user", selectedUser);
@@ -30,7 +31,7 @@ console.log(userDetails, "detalles de usuario")
   }, [idUser]);
 
   useEffect(() => {
-    if(!selectedUser) return;
+    if (!selectedUser) return;
     setLoading(true);
     getidconversation(objfindconversation)
       .then((su) => {
@@ -45,10 +46,7 @@ console.log(userDetails, "detalles de usuario")
         setLoading(false);
       })
       .catch((error) =>
-        console.log(
-          error,
-          "error de useefect de getidconversation en message"
-        )
+        console.log(error, "error de useefect de getidconversation en message")
       );
     setLoading(false);
   }, [selectedUser]);
@@ -57,6 +55,7 @@ console.log(userDetails, "detalles de usuario")
     <div className="h-screen overflow-hidden">
       <div className="flex flex-col sm:flex-row ml-10 mt-10 mr-10 h-5/6 ">
         <div className="border-solid border border-gray-400 bg-gray-700 text-white sm:basis-full basis-1/2 md:basis-1/4">
+          <Search userId={userDetails} />
           <Users onUserSelection={handleUserSelection} />
         </div>
 
@@ -74,7 +73,7 @@ console.log(userDetails, "detalles de usuario")
               selectedUserId={selectedUser}
               onDeleteUser={handleDeleteUser}
               userDetaile={userDetails}
-              idconversation ={idconversa}
+              idconversation={idconversa}
             />
           )}
         </div>
